@@ -22,6 +22,13 @@ npm install @jspsych-contrib/plugin-rdk
 import jsPsychRdk from '@jspsych-contrib/plugin-rdk';
 ```
 
+## Development
+
+1. Clone this repo and set as working path.
+2. Run `npm install` to install required packages.
+3. Run `npm build --watch` to render the distribution.
+4. Open one of the example html to show the basic function.
+
 ## Compatibility
 
 jsPsych v7.0.
