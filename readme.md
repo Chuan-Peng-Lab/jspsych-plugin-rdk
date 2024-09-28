@@ -29,6 +29,13 @@ import jsPsychRdk from '@jspsych-contrib/plugin-rdk';
 3. Run `npm build --watch` to render the distribution.
 4. Open one of the example html to show the basic function.
 
+### Codespace dev
+
+If you are in the codespace enviroment, please execute two additional processes: 
+1. install live-server by `npm install -g live-server`. 
+2. run `live-server`. 
+3. Open the popup windows and open the example html.  
+
 ## Compatibility
 
 jsPsych v7.0.
