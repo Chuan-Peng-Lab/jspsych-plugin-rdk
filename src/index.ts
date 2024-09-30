@@ -105,6 +105,18 @@ const info = <const>{
       pretty_name: "Dot color",
       default: "white",
     },
+    /** The delay in frames before the dot color changes. */
+    dot_color_delay: {
+      type: ParameterType.INT,
+      pretty_name: "Dot color delay",
+      default: 10,
+    },
+    /** The delay in frames before the type of move changes. */
+    move_delay: {
+      type: ParameterType.INT,
+      pretty_name: "Move delay",
+      default: 10,
+    },
     /** The shape of the dots */
     dot_shape: {
       type: ParameterType.STRING,
@@ -261,6 +273,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var aperture_width = assignParameterValue(trial.aperture_width, 600);
     var aperture_height = assignParameterValue(trial.aperture_height, 400);
     var dot_color = assignParameterValue(trial.dot_color, "white");
+    var dot_color_delay = assignParameterValue(trial.dot_color_delay, 10);
+    var move_delay = assignParameterValue(trial.move_delay, 10);
     var dot_shape = assignParameterValue(trial.dot_shape, "circle");
     var background_color = assignParameterValue(trial.background_color, "gray");
     var RDK_type = assignParameterValue(trial.RDK_type, 3);
@@ -297,6 +311,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var apertureWidth = aperture_width; // How many pixels wide the aperture is. For square aperture this will be the both height and width. For circle, this will be the diameter.
     var apertureHeight = aperture_height; //How many pixels high the aperture is. Only relevant for ellipse and rectangle apertures. For circle and square, this is ignored.
     var dotColor = dot_color; //Color of the dots
+    var dotColorDelay = dot_color_delay; //How many frames before the dots will change color
+    var moveDelay = move_delay; //How many frames before the dots will move in a direction
     var backgroundColor = background_color; //Color of the background
     var apertureCenterX = aperture_center_x; // The x-coordinate of center of the aperture on the screen, in pixels
     var apertureCenterY = aperture_center_y; // The y-coordinate of center of the aperture on the screen, in pixels
@@ -428,6 +444,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var apertureWidthArray;
     var apertureHeightArray;
     var dotColorArray;
+    var dotColorDelayArray;
+    var moveDelayArray;
     var dotShapeArray;
     var apertureCenterXArray;
     var apertureCenterYArray;
@@ -457,6 +475,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       apertureWidthArray = setParameter(apertureWidth);
       apertureHeightArray = setParameter(apertureHeight);
       dotColorArray = setParameter(dotColor);
+      dotColorDelayArray = setParameter(dotColorDelay);
+      moveDelayArray = setParameter(moveDelay);
       dotShapeArray = setParameter(dotShape);
       apertureCenterXArray = setParameter(apertureCenterX);
       apertureCenterYArray = setParameter(apertureCenterY);
@@ -533,6 +553,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     //variable to store how many frames were presented.
     var numberOfFrames = 0;
 
+    //Variable to store the frame counter
+    var frameCounter = 0;
+
     // set up dot-drawing abstractions
     const pi2 = Math.PI * 2;
     const circleFn = (x: number, y: number, rad: number) => {
@@ -605,6 +628,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         aperture_width: aperture_width,
         aperture_height: aperture_height,
         dot_color: dot_color,
+        dot_color_delay: dot_color_delay, //The delay between dot color changes
+        move_delay: move_delay, //The delay between dot movement
         dot_shape: dot_shape,
         background_color: background_color,
         RDK_type: RDK_type,
@@ -743,6 +768,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       apertureWidth = apertureWidthArray[currentApertureNumber];
       apertureHeight = apertureHeightArray[currentApertureNumber];
       dotColor = dotColorArray[currentApertureNumber];
+      dotColorDelay = dotColorDelayArray[currentApertureNumber];
+      moveDelay = moveDelayArray[currentApertureNumber];
       dotShape = dotShapeArray[currentApertureNumber];
       apertureCenterX = apertureCenterXArray[currentApertureNumber];
       apertureCenterY = apertureCenterYArray[currentApertureNumber];
@@ -970,14 +997,23 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       }
 
       //Loop through the dots one by one and draw them
-      ctx.fillStyle = dotColor;
-      ctx.beginPath();
       for (let i = 0; i < nDots; i++) {
         const dot = dotArray[i];
+        ctx.beginPath();
+        if (frameCounter < dotColorDelay) {
+          if (i < nDots/2) {
+            ctx.fillStyle = "red";
+          } else {
+            ctx.fillStyle = "blue";
+          };
+        } else {
+          ctx.fillStyle = dotColor;
+        }
         ctx.moveTo(dot.x + dot_size, dot.y);
         drawFn(dot.x, dot.y, dot_size);
+        ctx.fill();
       }
-      ctx.fill();
+      
 
       //Draw the border if we want it
       if (border === true) {
@@ -1047,7 +1083,11 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         ) {
           //Randomly select if the dot goes in a constant direction or random position, weighted based on the coherence level
           if (randomValue < coherence) {
-            dot = constantDirectionUpdate(dot);
+            if (frameCounter < moveDelay) {
+              dot = randomDirectionUpdate(dot);
+            } else {
+              dot = constantDirectionUpdate(dot);
+            };
           } else if (randomValue >= coherence && randomValue < coherence + oppositeCoherence) {
             dot = oppositeDirectionUpdate(dot);
           } else {
@@ -1165,20 +1205,36 @@ class RdkPlugin implements JsPsychPlugin<Info> {
 
     //Updates the x and y coordinates by moving it in the x and y coherent directions
     function constantDirectionUpdate(dot) {
-      dot.x += dot.vx;
-      dot.y += dot.vy;
-      dot.latestXMove = dot.vx;
-      dot.latestYMove = dot.vy;
-      return dot;
+      if (frameCounter < moveDelay) {
+        dot.x += dot.vx2;
+        dot.y += dot.vy2;
+        dot.latestXMove = dot.vx2;
+        dot.latestYMove = dot.vy2;
+        return dot;
+      } else {
+        dot.x += dot.vx;
+        dot.y += dot.vy;
+        dot.latestXMove = dot.vx;
+        dot.latestYMove = dot.vy;
+        return dot;
+      };
     }
 
     //Updates the x and y coordinates by moving it in the opposite x and y coherent directions
     function oppositeDirectionUpdate(dot) {
-      dot.x -= dot.vx;
-      dot.y -= dot.vy;
-      dot.latestXMove = -dot.vx;
-      dot.latestYMove = -dot.vy;
+      if (frameCounter < moveDelay) {
+        dot.x += dot.vx2;
+        dot.y += dot.vy2;
+        dot.latestXMove = dot.vx2;
+        dot.latestYMove = dot.vy2;
+        return dot;
+      } else {
+        dot.x -= dot.vx;
+        dot.y -= dot.vy;
+        dot.latestXMove = -dot.vx;
+        dot.latestYMove = -dot.vy;
       return dot;
+      };
     }
 
     //Creates a new angle to move towards and updates the x and y coordinates
@@ -1403,6 +1459,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
             var currentTimeStamp = performance.now(); //Variable to hold current timestamp
             (frameRate as number[]).push(Math.round(currentTimeStamp - previousTimestamp)); //Push the interval into the frameRate array
             previousTimestamp = currentTimeStamp; //Reset the timestamp
+            frameCounter++; //Increment the frame counter
           }
         }
       }
