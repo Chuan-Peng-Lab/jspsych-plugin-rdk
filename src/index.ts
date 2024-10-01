@@ -898,6 +898,8 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         if (RDK == 3) {
           //For coherent dots
           if (i < nCoherentDots) {
+            //if judgement can't be used here, otherwise it can't work
+            dot = setvx2vy2(dot); // Set dot.vx2 and dot.vy2
             dot = setvxvy(dot); // Set dot.vx and dot.vy
             dot.updateType = "constant direction";
           }
@@ -1068,7 +1070,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         var randomValue = Math.random();
 
         //Update based on the dot's update type
-        if (dot.updateType == "constant direction") {
+        if (dot.updateType == "constant direction" ) {
           dot = constantDirectionUpdate(dot);
         } else if (dot.updateType == "opposite direction") {
           dot = oppositeDirectionUpdate(dot);
@@ -1083,11 +1085,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         ) {
           //Randomly select if the dot goes in a constant direction or random position, weighted based on the coherence level
           if (randomValue < coherence) {
-            if (frameCounter < moveDelay) {
-              dot = randomDirectionUpdate(dot);
-            } else {
-              dot = constantDirectionUpdate(dot);
-            };
+            dot = constantDirectionUpdate(dot);
           } else if (randomValue >= coherence && randomValue < coherence + oppositeCoherence) {
             dot = oppositeDirectionUpdate(dot);
           } else {
@@ -1210,14 +1208,13 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         dot.y += dot.vy2;
         dot.latestXMove = dot.vx2;
         dot.latestYMove = dot.vy2;
-        return dot;
       } else {
         dot.x += dot.vx;
         dot.y += dot.vy;
         dot.latestXMove = dot.vx;
         dot.latestYMove = dot.vy;
-        return dot;
       };
+      return dot;
     }
 
     //Updates the x and y coordinates by moving it in the opposite x and y coherent directions
@@ -1227,14 +1224,13 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         dot.y += dot.vy2;
         dot.latestXMove = dot.vx2;
         dot.latestYMove = dot.vy2;
-        return dot;
       } else {
         dot.x -= dot.vx;
         dot.y -= dot.vy;
         dot.latestXMove = -dot.vx;
         dot.latestYMove = -dot.vy;
-      return dot;
       };
+      return dot;
     }
 
     //Creates a new angle to move towards and updates the x and y coordinates
