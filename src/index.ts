@@ -99,16 +99,27 @@ const info = <const>{
       pretty_name: "Aperture height",
       default: 400,
     },
-    /** The color of the dots. */
-    dot_color: {
+    /** The dots' color before the change. */
+    dot_color_beforeOne: {
       type: ParameterType.STRING,
-      pretty_name: "Dot color",
+      pretty_name: "color of the first half of dots before change",
+      default: "grey",
+    },
+    dot_color_beforeTwo: {
+      type: ParameterType.STRING,
+      pretty_name: "color of the last half of dots before change",
+      default: "grey",
+    },
+    /** The dots' color after the change. */
+    dot_color_after: {
+      type: ParameterType.STRING,
+      pretty_name: "Dot color after change",
       default: "white",
     },
     /** The delay in frames before the dot color changes. */
     dot_color_delay: {
       type: ParameterType.INT,
-      pretty_name: "Dot color delay",
+      pretty_name: "Dot color delay before change",
       default: 10,
     },
     /** The delay in frames before the type of move changes. */
@@ -272,7 +283,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var move_distance = assignParameterValue(trial.move_distance, 1);
     var aperture_width = assignParameterValue(trial.aperture_width, 600);
     var aperture_height = assignParameterValue(trial.aperture_height, 400);
-    var dot_color = assignParameterValue(trial.dot_color, "white");
+    var dot_color_beforeOne = assignParameterValue(trial.dot_color_beforeOne, "grey");
+    var dot_color_beforeTwo = assignParameterValue(trial.dot_color_beforeTwo, "grey");
+    var dot_color_after = assignParameterValue(trial.dot_color_after, "white");
     var dot_color_delay = assignParameterValue(trial.dot_color_delay, 10);
     var move_delay = assignParameterValue(trial.move_delay, 10);
     var dot_shape = assignParameterValue(trial.dot_shape, "circle");
@@ -310,7 +323,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var moveDistance = move_distance; //How many pixels the dots move per frame
     var apertureWidth = aperture_width; // How many pixels wide the aperture is. For square aperture this will be the both height and width. For circle, this will be the diameter.
     var apertureHeight = aperture_height; //How many pixels high the aperture is. Only relevant for ellipse and rectangle apertures. For circle and square, this is ignored.
-    var dotColor = dot_color; //Color of the dots
+    var dotColorBeforeOne = dot_color_beforeOne; //Color of the dots before the change
+    var dotColorBeforeTwo = dot_color_beforeTwo;
+    var dotColorAfter = dot_color_after; //Color of the dots after the change
     var dotColorDelay = dot_color_delay; //How many frames before the dots will change color
     var moveDelay = move_delay; //How many frames before the dots will move in a direction
     var backgroundColor = background_color; //Color of the background
@@ -443,7 +458,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var moveDistanceArray;
     var apertureWidthArray;
     var apertureHeightArray;
-    var dotColorArray;
+    var dotColorBeforeOneArray;
+    var dotColorBeforeTwoArray;
+    var dotColorAfterArray
     var dotColorDelayArray;
     var moveDelayArray;
     var dotShapeArray;
@@ -474,7 +491,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       moveDistanceArray = setParameter(moveDistance);
       apertureWidthArray = setParameter(apertureWidth);
       apertureHeightArray = setParameter(apertureHeight);
-      dotColorArray = setParameter(dotColor);
+      dotColorBeforeOneArray = setParameter(dotColorBeforeOne);
+      dotColorBeforeTwoArray = setParameter(dotColorBeforeTwo);
+      dotColorAfterArray = setParameter(dotColorAfter);
       dotColorDelayArray = setParameter(dotColorDelay);
       moveDelayArray = setParameter(moveDelay);
       dotShapeArray = setParameter(dotShape);
@@ -627,7 +646,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         move_distance: move_distance,
         aperture_width: aperture_width,
         aperture_height: aperture_height,
-        dot_color: dot_color,
+        dot_color_beforeOne: dot_color_beforeOne,
+        dot_color_beforeTwo: dot_color_beforeTwo,
+        dot_color_after: dot_color_after,
         dot_color_delay: dot_color_delay, //The delay between dot color changes
         move_delay: move_delay, //The delay between dot movement
         dot_shape: dot_shape,
@@ -767,7 +788,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       moveDistance = moveDistanceArray[currentApertureNumber];
       apertureWidth = apertureWidthArray[currentApertureNumber];
       apertureHeight = apertureHeightArray[currentApertureNumber];
-      dotColor = dotColorArray[currentApertureNumber];
+      dotColorBeforeOne = dotColorBeforeOneArray[currentApertureNumber];
+      dotColorBeforeTwo = dotColorBeforeTwoArray[currentApertureNumber];
+      dotColorAfter = dotColorAfterArray[currentApertureNumber];
       dotColorDelay = dotColorDelayArray[currentApertureNumber];
       moveDelay = moveDelayArray[currentApertureNumber];
       dotShape = dotShapeArray[currentApertureNumber];
@@ -1003,13 +1026,15 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         const dot = dotArray[i];
         ctx.beginPath();
         if (frameCounter < dotColorDelay) {
-          if (i < nDots/2) {
-            ctx.fillStyle = "red";
-          } else {
-            ctx.fillStyle = "blue";
+          for (let t = 0; t < 2; t++) {
+            if (i < nDots/2) {
+              ctx.fillStyle = dotColorBeforeOne;
+            } else {
+              ctx.fillStyle = dotColorBeforeTwo;
+            };
           };
         } else {
-          ctx.fillStyle = dotColor;
+          ctx.fillStyle = dotColorAfter;
         }
         ctx.moveTo(dot.x + dot_size, dot.y);
         drawFn(dot.x, dot.y, dot_size);
