@@ -40,11 +40,11 @@ const info = <const>{
       default: 300,
     },
     /** The number of sets of dots to cycle through. */
-    /*number_of_sets: {
+    number_of_sets: {
       type: ParameterType.INT,
       pretty_name: "Number of sets",
       default: 1,
-    },*/
+    },
     /** The direction of coherent motion in degrees. */
     coherent_direction: {
       type: ParameterType.INT,
@@ -99,37 +99,11 @@ const info = <const>{
       pretty_name: "Aperture height",
       default: 400,
     },
-    /** The dots' color before the change. */
+    /** The color of the dots. */
     dot_color: {
       type: ParameterType.STRING,
-      array: true,
-      pretty_name: "Dot color before change",
-      default: ["white"],
-    },
-    /** The dots' color after the change. */
-    dot_color_final: {
-      type: ParameterType.STRING,
-      array: true,
-      pretty_name: "Dot color after change",
-      default: ["white"],
-    },
-    /** The proportion of traget dots'colors. */
-    target_color_proportion: {
-      type: ParameterType.FLOAT,
-      pretty_name: "Target color proportion",
-      default: 0,
-    },
-    /** The delay in frames before the dot color changes. */
-    color_change_delay: {
-      type: ParameterType.INT,
-      pretty_name: "Color change delay time",
-      default: 0,
-    },
-    /** The delay in frames before the type of move changes. */
-    motion_change_delay: {
-      type: ParameterType.INT,
-      pretty_name: "Motion change delay time",
-      default: 0,
+      pretty_name: "Dot color",
+      default: "white",
     },
     /** The shape of the dots */
     dot_shape: {
@@ -276,7 +250,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var response_ends_trial = assignParameterValue(trial.response_ends_trial, true);
     var number_of_apertures = assignParameterValue(trial.number_of_apertures, 1);
     var number_of_dots = assignParameterValue(trial.number_of_dots, 300);
-    // var number_of_sets = assignParameterValue(trial.number_of_sets, 1);
+    var number_of_sets = assignParameterValue(trial.number_of_sets, 1);
     var coherent_direction = assignParameterValue(trial.coherent_direction, 0);
     var coherence = assignParameterValue(trial.coherence, 0.5);
     var opposite_coherence = assignParameterValue(trial.opposite_coherence, 0);
@@ -286,11 +260,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var move_distance = assignParameterValue(trial.move_distance, 1);
     var aperture_width = assignParameterValue(trial.aperture_width, 600);
     var aperture_height = assignParameterValue(trial.aperture_height, 400);
-    var dot_color = assignParameterValue(trial.dot_color, ["white"]);
-    var target_color_proportion = assignParameterValue(trial.target_color_proportion, 0);
-    var dot_color_final = assignParameterValue(trial.dot_color_final, ["white"]);
-    var color_change_delay = assignParameterValue(trial.color_change_delay, 0);
-    var motion_change_delay = assignParameterValue(trial.motion_change_delay, 0);
+    var dot_color = assignParameterValue(trial.dot_color, "white");
     var dot_shape = assignParameterValue(trial.dot_shape, "circle");
     var background_color = assignParameterValue(trial.background_color, "gray");
     var RDK_type = assignParameterValue(trial.RDK_type, 3);
@@ -316,7 +286,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
 
     var nApertures = number_of_apertures; //The number of apertures
     var nDots = number_of_dots; //Number of dots per set (equivalent to number of dots per frame)
-    var nSets = 1 // number_of_sets; //Number of sets to cycle through per frame
+    var nSets = number_of_sets; //Number of sets to cycle through per frame
     var coherentDirection = coherent_direction; //The direction of the coherentDots in degrees. Starts at 3 o'clock and goes counterclockwise (0 == rightwards, 90 == upwards, 180 == leftwards, 270 == downwards), range 0 - 360
     var coherence = coherence; //Proportion of dots to move together, range from 0 to 1
     var oppositeCoherence = opposite_coherence; // The coherence for the dots going the opposite direction as the coherent dots
@@ -326,11 +296,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var moveDistance = move_distance; //How many pixels the dots move per frame
     var apertureWidth = aperture_width; // How many pixels wide the aperture is. For square aperture this will be the both height and width. For circle, this will be the diameter.
     var apertureHeight = aperture_height; //How many pixels high the aperture is. Only relevant for ellipse and rectangle apertures. For circle and square, this is ignored.
-    var dotColor = dot_color; //Color of the dots before the change
-    var targetColorProportion = target_color_proportion; //Proportion of dots that will be designated as the target color
-    var dotColorFinal = dot_color_final; //Color of the dots after the change
-    var colorChangeDelay = color_change_delay; //How many frames before the dots will change color
-    var motionChangeDelay = motion_change_delay; //How many frames before the dots will move in a direction
+    var dotColor = dot_color; //Color of the dots
     var backgroundColor = background_color; //Color of the background
     var apertureCenterX = aperture_center_x; // The x-coordinate of center of the aperture on the screen, in pixels
     var apertureCenterY = aperture_center_y; // The y-coordinate of center of the aperture on the screen, in pixels
@@ -462,10 +428,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var apertureWidthArray;
     var apertureHeightArray;
     var dotColorArray;
-    var dotColorFinalArray;
-    var targetColorProportionArray;
-    var colorChangeDelayArray;
-    var motionChangeDelayArray;
     var dotShapeArray;
     var apertureCenterXArray;
     var apertureCenterYArray;
@@ -495,10 +457,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       apertureWidthArray = setParameter(apertureWidth);
       apertureHeightArray = setParameter(apertureHeight);
       dotColorArray = setParameter(dotColor);
-      dotColorFinalArray = setParameter(dotColorFinal);
-      colorChangeDelayArray = setParameter(colorChangeDelay);
-      targetColorProportionArray = setParameter(targetColorProportion);
-      motionChangeDelayArray = setParameter(motionChangeDelay);
       dotShapeArray = setParameter(dotShape);
       apertureCenterXArray = setParameter(apertureCenterX);
       apertureCenterYArray = setParameter(apertureCenterY);
@@ -542,9 +500,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     var nOppositeCoherentDots;
     var nIncoherentDots;
 
-    //Calculate the number of colors'proportion
-    var nColorsProportion;
-
     //Make the array of arrays containing dot objects
     var dotArray2d;
 
@@ -577,9 +532,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
 
     //variable to store how many frames were presented.
     var numberOfFrames = 0;
-
-    //Variable to store the frame counter
-    var frameCounter = 0;
 
     // set up dot-drawing abstractions
     const pi2 = Math.PI * 2;
@@ -642,7 +594,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         response_ends_trial: response_ends_trial, //If the response ends the trial
         number_of_apertures: number_of_apertures,
         number_of_dots: number_of_dots,
-        //number_of_sets: number_of_sets,
+        number_of_sets: number_of_sets,
         coherent_direction: coherent_direction,
         coherence: coherence,
         opposite_coherence: opposite_coherence,
@@ -653,10 +605,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         aperture_width: aperture_width,
         aperture_height: aperture_height,
         dot_color: dot_color,
-        dot_color_final: dot_color_final, //The final changed color of the dots
-        color_change_delay: color_change_delay, //The delay between dot color changes
-        target_color_proportion: target_color_proportion, //The proportion of the target dot color 
-        motion_change_delay: motion_change_delay, //The delay between dot movement
         dot_shape: dot_shape,
         background_color: background_color,
         RDK_type: RDK_type,
@@ -755,11 +703,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       //Check if it is an array and its length matches the aperture then return the original array
       if (originalVariable.constructor === Array && originalVariable.length === nApertures) {
         return originalVariable;
-      } 
-      //If it is an array and its length is 1, then return the original array
-      else if (originalVariable.constructor === Array && nApertures === 1) {
-        return originalVariable;
-      } 
+      }
       //Else if it is not an array, we make it an array with duplicate values
       else if (originalVariable.constructor !== Array) {
         var tempArray = [];
@@ -771,41 +715,21 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         return tempArray;
       }
       //Else if the array is not long enough, then print out that error message
-      //Since some parameters have already been changed into arrays, arrays cannot be included here
-      else if (//originalVariable.constructor === Array && 
-        originalVariable.length !== nApertures) {
-          //Check whether the color arrays have the same length as the number of apertures
-          if (dotColorFinal.length !== nApertures || dotColor.length !== nApertures) { 
-            console.error (
-              "If you have more than one aperture and want to have two final colors, please ensure that the color corresponding to each aperture is an array, and the arrays that are passed in as parameters are the same length as the number of apertures."
-            );
-        } else {
-          console.error(
-            "If you have more than one aperture, please ensure that arrays that are passed in as parameters are the same length as the number of apertures. Else you can use a single value without the array"
-          );
-        }
+      else if (originalVariable.constructor === Array && originalVariable.length !== nApertures) {
+        console.error(
+          "If you have more than one aperture, please ensure that arrays that are passed in as parameters are the same length as the number of apertures. Else you can use a single value without the array"
+        );
+      }
       //Else print a generic error
-      } else {
+      else {
         console.error(
           "A parameter is incorrectly set. Please ensure that the nApertures parameter is set to the correct value (if using more than one aperture), and all others parameters are set correctly."
         );
       }
     }
 
-    //Function set to judge whether the color parameter is an array. If it isn't, convert it into an array
-    function makeColorArr(Color) {
-      if (Color.constructor !== Array) {
-        let colorArr = [];
-        colorArr.push(Color);
-        return colorArr;
-      } else {
-        return Color;
-      }
-    }
-
     //Function to set the global variables to the current aperture so that the correct dots are updated and drawn
     function initializeCurrentApertureParameters(currentApertureNumber?) {
-
       //Set the global variables to that relevant to the current aperture
       nDots = nDotsArray[currentApertureNumber];
       nSets = nSetsArray[currentApertureNumber];
@@ -818,9 +742,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       moveDistance = moveDistanceArray[currentApertureNumber];
       apertureWidth = apertureWidthArray[currentApertureNumber];
       apertureHeight = apertureHeightArray[currentApertureNumber];
-      targetColorProportion = targetColorProportionArray[currentApertureNumber];
-      colorChangeDelay = colorChangeDelayArray[currentApertureNumber];
-      motionChangeDelay = motionChangeDelayArray[currentApertureNumber];
+      dotColor = dotColorArray[currentApertureNumber];
       dotShape = dotShapeArray[currentApertureNumber];
       apertureCenterX = apertureCenterXArray[currentApertureNumber];
       apertureCenterY = apertureCenterYArray[currentApertureNumber];
@@ -835,30 +757,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       border = borderArray[currentApertureNumber];
       borderThickness = borderThicknessArray[currentApertureNumber];
       borderColor = borderColorArray[currentApertureNumber];
-      //If the color parameter isn't, convert it into an array
-      if (dotColor.constructor !== Array || dotColorFinal.constructor !== Array) { 
-        dotColor = makeColorArr(dotColor);
-        dotColorFinal = makeColorArr(dotColorFinal);
-      };
-      //Set the dot color
-      if (nApertures === 1) {
-        dotColor = dotColor;
-        dotColorFinal = dotColorFinal;
-      } else { 
-        if (dotColor.length === 1 && dotColorFinal.length === 1) {
-          dotColor = dotColor;
-          dotColorFinal = dotColorFinal;
-        } else if (dotColor.length > 1 && dotColorFinal.length === 1) {
-          dotColor = dotColorArray[currentApertureNumber];
-          dotColorFinal = dotColorFinal;
-        } else if (dotColor.length === 1 && dotColorFinal.length > 1) {
-          dotColor = dotColor;
-          dotColorFinal = dotColorFinalArray[currentApertureNumber];
-        } else {
-        dotColor = dotColorArray[currentApertureNumber]; 
-        dotColorFinal = dotColorFinalArray[currentApertureNumber]; 
-        }
-      };
 
       //Calculate the x and y jump sizes for coherent dots
       coherentJumpSizeX = calculateCoherentJumpSizeX(coherentDirection);
@@ -871,9 +769,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       nCoherentDots = nDots * coherence;
       nOppositeCoherentDots = nDots * oppositeCoherence;
       nIncoherentDots = nDots - (nCoherentDots + nOppositeCoherentDots);
-
-      //Calculate the number of colors'proportion
-      nColorsProportion = nDots * targetColorProportion;
 
       //If the 3d array has been made, then choose the 2d array and the current set
       dotArray2d = dotArray3d.length !== 0 ? dotArray3d[currentApertureNumber] : undefined;
@@ -917,14 +812,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
 
     //Make the dot array
     function makeDotArray() {
-      //Error message: The number of colors should not exceed 2
-      if (nApertures === 1) {
-        if (dotColorFinal.length > 2 || dotColor.length > 2) {
-          console.error(
-            "The number of colors must be less than or equal to 2."
-          )
-        }
-      }
       var tempArray = [];
       for (var i = 0; i < nDots; i++) {
         //Initialize a dot to be modified and inserted into the array
@@ -948,7 +835,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         if (RDK == 1) {
           //For coherent dots
           if (i < nCoherentDots) {
-            //dot = setvx2vy2(dot);
             dot = setvxvy(dot); // Set dot.vx and dot.vy
             dot.updateType = "constant direction";
           }
@@ -967,7 +853,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         if (RDK == 2) {
           //For coherent dots
           if (i < nCoherentDots) {
-            //dot = setvx2vy2(dot);
             dot = setvxvy(dot); // Set dot.vx and dot.vy
             dot.updateType = "constant direction";
           }
@@ -986,8 +871,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         if (RDK == 3) {
           //For coherent dots
           if (i < nCoherentDots) {
-            //if judgement can't be used here, otherwise it can't work
-            dot = setvx2vy2(dot); // Set dot.vx2 and dot.vy2
             dot = setvxvy(dot); // Set dot.vx and dot.vy
             dot.updateType = "constant direction";
           }
@@ -1006,7 +889,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         //For the different && random position RDK type
         if (RDK == 4) {
           //For all dots
-          dot = setvx2vy2(dot);
           dot = setvxvy(dot); // Set dot.vx and dot.vy
           dot.updateType = "constant direction or opposite direction or random position";
         } //End of RDK==4
@@ -1014,7 +896,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         //For the different && random walk RDK type
         if (RDK == 5) {
           //For all dots
-          dot = setvx2vy2(dot);
           dot = setvxvy(dot); // Set dot.vx and dot.vy
           dot.updateType = "constant direction or opposite direction or random walk";
         } //End of RDK==5
@@ -1022,7 +903,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         //For the different && random direction RDK type
         if (RDK == 6) {
           //For all dots
-          dot = setvx2vy2(dot);
           dot = setvxvy(dot); // Set dot.vx and dot.vy
           //Each dot will have its own alternate direction of motion
           setvx2vy2(dot); // Set dot.vx2 and dot.vy2
@@ -1077,7 +957,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
     //Draw the dots on the canvas after they're updated
     function draw() {
       //Load in the current set of dot array for easy handling
-      dotArray = dotArray2d[currentSetArray[currentApertureNumber]];
+      const dotArray = dotArray2d[currentSetArray[currentApertureNumber]];
 
       let drawFn;
       let dot_size;
@@ -1090,50 +970,15 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       }
 
       //Loop through the dots one by one and draw them
+      ctx.fillStyle = dotColor;
+      ctx.beginPath();
       for (let i = 0; i < nDots; i++) {
         const dot = dotArray[i];
-        //nColorsProportion = nDots * dotColorProportion;
-        ctx.beginPath();
-        if (colorChangeDelay === 0) { //0 means no color change 
-          if (dotColor.length === 1) { //Check whether the initial color is a single color
-            ctx.fillStyle = dotColor; //For a single color, directly use the first color with the index [0]
-          //If the initial color consists of two colors, the first half of the dots will be the first color, and the second half will be the second color
-          } else { 
-            if (i < nDots/2) {
-              ctx.fillStyle = dotColor[0];
-            } else {
-              ctx.fillStyle = dotColor[1];
-            }
-          }
-        } else { //If the color change is to be set, the current color should be determined according to the current frame
-          if (frameCounter < colorChangeDelay) { //Before the time point of color change, the initial color is still used
-            if (dotColor.length === 1) {
-              ctx.fillStyle = dotColor[0];
-            } else {
-              if (i < nDots/2) {
-                ctx.fillStyle = dotColor[0];
-              } else {
-                ctx.fillStyle = dotColor[1];
-              }
-            }
-          } else {
-            if (dotColorFinal.length === 1) { //If the final color is a single color, then all dots will be this single color
-              ctx.fillStyle = dotColorFinal[0];
-            //If there are two final colors, the first one is the target color (number == nColorsProportion), and the second one is the distractor color (number == nDots - nColorsProportion)
-            } else { 
-              if (i < nColorsProportion) { 
-                ctx.fillStyle = dotColorFinal[0];
-              } else {
-                ctx.fillStyle = dotColorFinal[1];
-              }
-            }     
-          }
-        }
         ctx.moveTo(dot.x + dot_size, dot.y);
         drawFn(dot.x, dot.y, dot_size);
-        ctx.fill();
-      };
-      
+      }
+      ctx.fill();
+
       //Draw the border if we want it
       if (border === true) {
         //For circle and ellipse
@@ -1175,9 +1020,9 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       } else {
         currentSetArray[currentApertureNumber] = currentSetArray[currentApertureNumber] + 1;
       }
-      
+
       //Load in the current set of dot array for easy handling
-      dotArray = dotArray2d[currentSetArray[currentApertureNumber]];
+      var dotArray = dotArray2d[currentSetArray[currentApertureNumber]];
 
       //Loop through the dots one by one and update them accordingly
       for (var i = 0; i < nDots; i++) {
@@ -1187,7 +1032,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
         var randomValue = Math.random();
 
         //Update based on the dot's update type
-        if (dot.updateType == "constant direction" ) {
+        if (dot.updateType == "constant direction") {
           dot = constantDirectionUpdate(dot);
         } else if (dot.updateType == "opposite direction") {
           dot = oppositeDirectionUpdate(dot);
@@ -1320,40 +1165,19 @@ class RdkPlugin implements JsPsychPlugin<Info> {
 
     //Updates the x and y coordinates by moving it in the x and y coherent directions
     function constantDirectionUpdate(dot) {
-      //Before the motion delay time, all dots move according to the specified type
-      if (frameCounter < motionChangeDelay) {
-        if (RDK === 1) {
-          resetLocation(dot)
-        } else if (RDK === 2) {
-          randomWalkUpdate(dot)
-        } else if (RDK === 3) {
-          dot.x += dot.vx2;
-          dot.y += dot.vy2;
-          dot.latestXMove = dot.vx2;
-          dot.latestYMove = dot.vy2;
-        }
-      } else {
-        dot.x += dot.vx;
-        dot.y += dot.vy;
-        dot.latestXMove = dot.vx;
-        dot.latestYMove = dot.vy;
-      };
+      dot.x += dot.vx;
+      dot.y += dot.vy;
+      dot.latestXMove = dot.vx;
+      dot.latestYMove = dot.vy;
       return dot;
     }
 
     //Updates the x and y coordinates by moving it in the opposite x and y coherent directions
     function oppositeDirectionUpdate(dot) {
-      if (frameCounter < motionChangeDelay) {
-        dot.x += dot.vx2;
-        dot.y += dot.vy2;
-        dot.latestXMove = dot.vx2;
-        dot.latestYMove = dot.vy2;
-      } else {
-        dot.x -= dot.vx;
-        dot.y -= dot.vy;
-        dot.latestXMove = -dot.vx;
-        dot.latestYMove = -dot.vy;
-      };
+      dot.x -= dot.vx;
+      dot.y -= dot.vy;
+      dot.latestXMove = -dot.vx;
+      dot.latestYMove = -dot.vy;
       return dot;
     }
 
@@ -1367,7 +1191,7 @@ class RdkPlugin implements JsPsychPlugin<Info> {
       //Update x and y coordinates with the new location
       dot.x += dot.latestXMove;
       dot.y += dot.latestYMove;
-      return dot
+      return dot;
     }
 
     //Updates the x and y coordinates with the alternative move direction
@@ -1579,7 +1403,6 @@ class RdkPlugin implements JsPsychPlugin<Info> {
             var currentTimeStamp = performance.now(); //Variable to hold current timestamp
             (frameRate as number[]).push(Math.round(currentTimeStamp - previousTimestamp)); //Push the interval into the frameRate array
             previousTimestamp = currentTimeStamp; //Reset the timestamp
-            frameCounter++; //Increment the frame counter
           }
         }
       }

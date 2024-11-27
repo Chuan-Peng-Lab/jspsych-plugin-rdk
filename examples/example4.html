@@ -3,7 +3,7 @@
 <head>
   <script src="https://unpkg.com/jspsych@7.0.0"></script>
   <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
-  <script src="../src/index.js"></script>
+  <script src="../dist/index.browser.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css">
   <style>
     .jspsych-btn {margin-bottom: 10px;}
@@ -30,47 +30,18 @@
     },
     choices: ['Repeat demo']
   };
-  
+   
   var trial = {
+    type: jsPsychRdk,
+    color_change_delay: 200,
     type: jsPsychRdk, 
-    number_of_apertures: 4, //This needs to be set if more than one aperture
-    trial_duration: 30000,
-    dot_radius: 3,
-    move_distance: 1.7,
-    background_color: "black",
+    number_of_apertures: 3, //This needs to be set if more than one aperture
+    trial_duration: 10000,
     correct_choice: ["a"],
-    dot_color_beforeOne: "hsl(0, 50%, 50%)",
-    dot_color_beforeTwo: "hsl(225, 50%, 50%)",
-    dot_color_after: [
-      "hsl(0, 50%, 50%)", "hsl(225, 50%, 50%)", 
-      "hsl(225, 50%, 50%)", "hsl(0, 50%, 50%)", 
-      //"hsl(0, 50%, 50%)", "hsl(225, 50%, 50%)", 
-      //"hsl(225, 50%, 50%)", "hsl(0, 50%, 50%)"
-    ],
-    dot_color_delay: 500,
-    move_delay: 800,
-    coherent_direction: 180,
-    coherence: [ 
-      0.2, 0.2, 
-      0.6, 0.6,  
-      //0.2, 0.2, 
-      //0.6, 0.6
-    ],
     RDK_type: 3, //Applied to all apertures if only one value
-    aperture_width: 400, //Applied to all apertures if only one value
-    aperture_height: 400,
-    number_of_dots: [
-      80, 20,
-      //90, 10,
-      //60, 40,
-      80, 20,
-    ],//Different parameter for each aperture. Array length must equal number_of_apertures
-    aperture_center_x: [
-      //window.innerWidth/2 - 450, window.innerWidth/2 - 450, 
-      window.innerWidth/2 -300, window.innerWidth/2 -300,
-      window.innerWidth/2 + 300, window.innerWidth/2 + 300,
-     // window.innerWidth/2 +450, window.innerWidth/2 +450
-    ] //Separate the apertures on the screen (window.innerWidth/2 is the middle of the screen)
+    aperture_width: 200, //Applied to all apertures if only one value
+    number_of_dots: [50, 200, 100], //Different parameter for each aperture. Array length must equal number_of_apertures
+    aperture_center_x: [(window.innerWidth/2)-300,window.innerWidth/2,(window.innerWidth/2)+300] //Separate the apertures on the screen (window.innerWidth/2 is the middle of the screen)
   };
   
   var trial_loop = {
@@ -81,7 +52,7 @@
   };
 
   if (typeof jsPsych !== "undefined") {
-    jsPsych.run([start, trial_loop])
+    jsPsych.run([start, trial_loop]);
   } else {
     document.body.innerHTML = '<div style="text-align:center; margin-top:50%; transform:translate(0,-50%);">You must be online to view the plugin demo.</div>';
   }

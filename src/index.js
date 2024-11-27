@@ -914,17 +914,18 @@ var jsPsychRdk = (function (jspsych) {
               }
               //Loop through the dots one by one and draw them
               for (let i = 0; i < nDots; i++) {
-                  const dot = dotArray[i];
+                  const dot = dotArray[t];
                   ctx.beginPath();
                   if (frameCounter < dotColorDelay) {
-                      for (let t = 0; t < 2; t++) {
+                      /*for (let t = 0; t < 2; t++) {
                           if (i < nDots / 2) {
                               ctx.fillStyle = dotColorBeforeOne;
                           }
                           else {
                               ctx.fillStyle = dotColorBeforeTwo;
                           }
-                      }
+                      }*/
+                        ctx.fillStyle = dotColorBeforeOne;
                   }
                   else {
                       ctx.fillStyle = dotColorAfter;

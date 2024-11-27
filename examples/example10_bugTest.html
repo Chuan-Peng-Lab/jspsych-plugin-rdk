@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://unpkg.com/jspsych@7.0.0"></script>
+		<script src="../dist/index.browser.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css">
+	</head>
+	<body></body>
+	<script>
+
+		var jsPsych = initJsPsych({
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+		/* 
+		We would appreciate it if you cited this paper when you use the RDK: 
+		Rajananda, S., Lau, H. & Odegaard, B., (2018). A Random-Dot Kinematogram for Web-Based Vision Research. Journal of Open Research Software. 6(1), p.6. DOI: [http://doi.org/10.5334/jors.194]
+		*/
+
+		//---------Create trials---------
+		
+		var RDK_trial = {
+			type: jsPsychRdk,
+			number_of_dots: 100, // Total number of dots in each aperture
+			RDK_type: 3, // The type of RDK used
+			choices: " ", // Choices available to be keyed in by participant
+			trial_duration: 5000, // Duration of earedch trial in ms
+			background_color: "grey",
+			target_color_proportion: 0.8,
+			aperture_width: 400, 
+			number_of_apertures: 2,
+			motion_change_delay: 100,
+			aperture_center_x: [(window.innerWidth/2)-250, window.innerWidth/2+250], //Separate the apertures on the screen (window.innerWidth/2 is the middle of the screen)
+			color_change_delay: 100, // The left one doesn't change, and the right one changes color after 100 frames (approximately 1.7 seconds)
+			dot_color_final: [["white", "white"], ["blue", "red"]], 
+
+			/*---------- The following example contains various incorrect input formats. 
+			  ---------- You can Check whether it will report errors ----------*/
+
+			//---------- aperture == 1  -----------
+
+			// Error 1：only two colors can be defined, error message: The number of colors must be less than or equal to 2.
+			//number_of_apertures: 1,
+			//dot_color_final: ["blue", "red", "green"], 
+
+			//---------- aperture >= 2  ----------
+			/* 
+			Error message: If you have more than one aperture and want to have two final colors, please ensure that the color corresponding to each aperture is an array, and the arrays that are passed in as parameters are the same length as the number of apertures.
+      If you want two different colors, you need a two-dimensional array which contains two inner arrays and the parameters are the same length as the number of apertures
+			*/
+
+			// Error 2.1：The input format must be a two-dimensional array
+			//dot_color_final: ["blue", "red"], 
+
+			// Error 2.2：You need two inner arrays
+			//dot_color_final: [["blue", "red"]],
+
+			// Error 2.3：The number of elements in both inner arrays must be equal to number_of_apertures
+			//dot_color_final: [["black"], ["blue", "red"]], 
+		};
+		
+		//---------Run the experiment---------
+		
+		jsPsych.run([RDK_trial]);
+
+	</script>
+</html>

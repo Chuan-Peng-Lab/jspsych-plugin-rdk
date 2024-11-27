@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://unpkg.com/jspsych@7.0.0"></script>
+		<script src="../dist/index.browser.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css">
+	</head>
+	<body></body>
+	<script>
+
+		var jsPsych = initJsPsych({
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+		/* 
+		We would appreciate it if you cited this paper when you use the RDK: 
+		Rajananda, S., Lau, H. & Odegaard, B., (2018). A Random-Dot Kinematogram for Web-Based Vision Research. Journal of Open Research Software. 6(1), p.6. DOI: [http://doi.org/10.5334/jors.194]
+		*/
+
+		//---------Create trials---------
+		
+		// Set color change (for two colors), the delay time of the change and the proportion of different colors
+		var RDK_trial = {
+			type: jsPsychRdk,
+			number_of_dots: 100, // Total number of dots in each aperture
+			RDK_type: 3, // The type of RDK used
+			choices: " ", // Choices available to be keyed in by participant
+			trial_duration: 5000, // Duration of each trial in ms
+			background_color: "grey",
+			dot_color_final:[["blue", "red"], ["blue", "red"]], //// This is the input format
+			target_color_proportion: 0.8, // The proportion of target color is 0.8, corresponding to the first color, that is, blue
+			color_change_delay: [0, 100], // The left one doesn't change, and the right one turns into blue and red after 100 frames (approximately 1.7 seconds)
+			number_of_apertures: 2,
+			aperture_width: 400, 
+			aperture_center_x: [(window.innerWidth/2)-250, window.innerWidth/2+250] //Separate the apertures on the screen (window.innerWidth/2 is the middle of the screen)
+		};
+		
+		//---------Run the experiment---------
+		
+		jsPsych.run([RDK_trial]);
+
+	</script>
+</html>
