@@ -36,6 +36,16 @@ If you are in the codespace enviroment, please execute two additional processes:
 2. run `live-server`. 
 3. Open the popup windows and open the example html.  
 
+### Publish
+
+Onece you have maken sure that all the code work out, you could publish your module in npm registry as 
+
+```bash
+npm publish --access=public
+```
+
+Or you could also use github action to help this process. 
+
 ## Compatibility
 
 jsPsych v7.0.
