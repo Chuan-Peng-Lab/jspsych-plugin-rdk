@@ -9,24 +9,24 @@ This plugin displays a Random Dot Kinematogram (RDK) and allows the subject to r
 ### In browser
 
 ```js
-<script src="https://unpkg.com/@jspsych-contrib/plugin-rdk@1.1.0"></script>
+<script src="https://unpkg.com/@panwanke/plugin-rdk@2.0.1"></script>
 ```
 
 ### Via NPM
 
 ```
-npm install @jspsych-contrib/plugin-rdk
+npm install @panwanke/plugin-rdk
 ```
 
 ```js
-import jsPsychRdk from '@jspsych-contrib/plugin-rdk';
+import jsPsychRdk from '@panwanke/plugin-rdk';
 ```
 
 ## Development
 
 1. Clone this repo and set as working path.
 2. Run `npm install` to install required packages.
-3. Run `npm build --watch` to render the distribution.
+3. Run `npm run build:watch` to render the distribution.
 4. Open one of the example html to show the basic function.
 
 ### Codespace dev
@@ -42,7 +42,7 @@ jsPsych v7.0.
 
 ## Documentation
 
-See [documentation](docs/jspsych-rdk.md)
+See [documentation](docs/jspsych-rdk_revised.md)
 
 ## Author / Citation
 
@@ -51,3 +51,5 @@ Created by [Sivananda Rajananda](https://github.com/vrsivananda), Hakwan Lau, an
 We would appreciate it if you cited this paper when you use the RDK plugin.
 
 Rajananda, S., Lau, H. & Odegaard, B., (2018). A Random-Dot Kinematogram for Web-Based Vision Research. *Journal of Open Research Software. 6*(1), p.6. doi:[10.5334/jors.194](http://doi.org/10.5334/jors.194)
+
+The plugin is revised by Siyu Wu and Wanke Pan in [Meta-Self Lab | Hu Chuan-Peng Lab](https://huchuanpeng.com/). 
